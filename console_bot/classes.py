@@ -1,6 +1,6 @@
 from collections import UserDict
 from functools import reduce
-from datetime import date, timedelta
+from datetime import date
 
 
 class NoNumberInContact(Exception):
@@ -71,7 +71,7 @@ class Record():
     def __init__(self, name, *phones, birthday=None):
         self.name = name         
         self.phones = [phone for phone in filter(lambda phone: phone.value, phones)]
-        self.birthday = birthday# if birthday.value else None
+        self.birthday = birthday
 
     def __str__(self):
         output = f'name: {self.name.value}'
@@ -85,7 +85,7 @@ class Record():
             birthday = self.birthday.value.strftime('%d %B')
             output += f' birthday: {birthday}'
 
-        return output + '\n'
+        return output
 
     def raise_nonumber(func):
         '''
@@ -150,6 +150,7 @@ class Record():
         return numbers
     
     def days_to_birthday(self):
+        '''Return number days to next birthday'''
         today = date.today()
         next_birthday = date(today.year, self.birthday.value.month, self.birthday.value.day)
         if today > next_birthday:
@@ -170,7 +171,7 @@ class AdressBook(UserDict):
         '''Show all records in the adress book data'''
         if not self.data:
             return 'There are no contacts in list'
-        output = reduce(lambda s, t: str(s) + str(t), 
+        output = reduce(lambda s, t: str(s) + '\n' + str(t), 
                         self.data.values(), 'Yor contacts:\n')
         return output
     
@@ -178,11 +179,12 @@ class AdressBook(UserDict):
         return self.iterator()
 
     def iterator(self, n=2):
+        'Return generator that show next n records'
         current = 0
         while current < len(self.data):
             group_number = current // n + 1
             output = reduce(
-                lambda s, t: str(s) + str(t), 
+                lambda s, t: str(s) + '\n' + str(t), 
                 list(self.data.values())[current:current+n], 
                 f'{group_number} group:\n'
                 )
@@ -194,28 +196,3 @@ class AdressBook(UserDict):
     
 
 
-# class Iterable:
-#     def __init__(self, n) -> None:
-#         self.cu
-#         self.n = n
-#         pass
-
-#     def __next__(self):
-#         if 
-
-
-
-
-# phone = Name('')
-# print(phone.value)
-
-if __name__ == '__main__':
-    r = Record(Name('Dima'), Phone('2312312'), birthday=Birthday(date(2012, 4, 12)))
-
-    a = AdressBook()
-    a.add_record(r)
-    my_iter = iter(a)
-    print(next(my_iter))
-    print(next(my_iter))
-    # for r in a:
-    #     print(r)

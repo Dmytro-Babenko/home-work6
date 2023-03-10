@@ -1,4 +1,5 @@
-from classes import Phone, Name, Record, AdressBook, NoNumberInContact, SameNumber, EmptyNumber
+from classes import Phone, Name, Birthday, Record, AdressBook, NoNumberInContact, SameNumber, EmptyNumber
+from datetime import datetime
 
 address_book = AdressBook()
 iterator = iter(address_book)
@@ -10,6 +11,10 @@ def input_error(func):
             output = func(*args, **kwargs)
         except KeyError:
             output = 'There no such contact'
+        except AttributeError:
+            output = 'There no birthday date in this contact'
+        except ValueError:
+            output = 'Date isnt exist or write in wrong way'
         except NoNumberInContact:
             output = 'There no such phone number in contact'
         except NameError:
@@ -29,22 +34,25 @@ def hello(*_) -> str:
     return output
 
 @input_error
-def adding(name: str, number: str, *_) -> str:
+def adding(name: str, number: str, arg, date: str, *_) -> str:
     '''If contact is existing add phone to it, else create contact'''
     record = address_book.data.get(name)
     phone = Phone(number)
     name = Name(name)
+    if date:
+        date = datetime.strptime(date, '%d.%m.%Y').date()
+        date = Birthday(date)
     if record:
         record.add_phone(phone)
         output = f'To contact {name.value} add new number: {phone.value}'
     else: 
-        record = Record(name, phone)
+        record = Record(name, phone, birthday=date)
         address_book.add_record(record)
-        output = f'Contact {name.value}: {number} is saved'
+        output = f'Contact {record} is saved'
     return output
 
 @input_error
-def changing(name: str, new_number: str, old_number: str) -> str:
+def changing(name: str, new_number: str, old_number: str, *_) -> str:
     '''Change contact in the dictionary'''
     record = address_book.data[name]
     new_phone = Phone(new_number)
@@ -67,6 +75,14 @@ def remove_phone(name: str, number: str, *_) -> str:
     phone = Phone(number)
     record.remove_phone(phone)
     output = f'Number {number} is deleted from contact {name}'
+    return output
+
+@input_error
+def days_to_birth(name: str, number: str, *_) -> str:
+    '''Remove phone from contact phone numbers'''
+    record = address_book.data[name]
+    days = record.days_to_birthday()
+    output = f'To {name} birthday {days} days'
     return output
 
 @input_error
