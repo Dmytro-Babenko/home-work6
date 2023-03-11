@@ -1,4 +1,4 @@
-from classes import Phone, Name, Birthday, Record, AdressBook, NoNumberInContact, SameNumber, EmptyNumber
+from classes import Phone, Name, Birthday, Record, AdressBook
 from datetime import datetime
 
 address_book = AdressBook()
@@ -9,20 +9,12 @@ def input_error(func):
     def inner(*args, **kwargs):
         try:
             output = func(*args, **kwargs)
-        except KeyError:
-            output = 'There no such contact'
+        except KeyError as ke:
+            output = f'There are no contact {str(ke)} in contacts'
+        except ValueError as ve:
+            output = str(ve).capitalize()
         except AttributeError:
             output = 'There no birthday date in this contact'
-        except ValueError:
-            output = 'Date isnt exist or write in wrong way'
-        except NoNumberInContact:
-            output = 'There no such phone number in contact'
-        except NameError:
-            output = 'Cant save contact with empty name'
-        except SameNumber:
-            output = 'This number is already in the contact numbers'
-        except EmptyNumber:
-            output = 'There no number in the command'
         except StopIteration: 
             output = 'There are no more contacts'
         return output 
@@ -78,7 +70,7 @@ def remove_phone(name: str, number: str, *_) -> str:
     return output
 
 @input_error
-def days_to_birth(name: str, number: str, *_) -> str:
+def days_to_birth(name: str, *_) -> str:
     '''Remove phone from contact phone numbers'''
     record = address_book.data[name]
     days = record.days_to_birthday()

@@ -2,16 +2,6 @@ from collections import UserDict
 from functools import reduce
 from datetime import date
 
-
-class NoNumberInContact(Exception):
-    pass
-
-class EmptyNumber(Exception):
-    pass
-
-class SameNumber(Exception):
-    pass
-
 class Field():
     '''Common field characters'''
     def __init__(self, value) -> None:
@@ -33,7 +23,7 @@ class Name(Field):
         if value:
             self.__value = value
         else:
-            raise NameError
+            raise ValueError('Cant save contact with empty name')
 
 class Phone(Field):
     '''Phone characters'''
@@ -50,7 +40,7 @@ class Phone(Field):
         if value.isdigit():
             self.__value = value
         elif value:
-            raise KeyError
+            raise ValueError(f'{value} it\'s not number')
 
 class Birthday(Field):
     def __init__(self, value) -> None:
@@ -94,7 +84,7 @@ class Record():
         '''
         def inner(self, phone, *args, **kwargs):
             if phone.value not in self.get_numbers():
-                raise NoNumberInContact
+                raise ValueError('There are no phone with such number in the phones')
             return func(self, phone, *args, **kwargs)
         return inner
     
@@ -107,7 +97,7 @@ class Record():
             phone = args[-1]
             number = phone.value
             if number in self.get_numbers():
-                raise SameNumber
+                raise ValueError('Already there is phone with such number in the phones')
             return func(self, *args, **kwargs)
         return inner
     
@@ -116,7 +106,7 @@ class Record():
         def inner(self, *args, **kwargs):
             for phone in args:
                 if not phone.value:
-                    raise EmptyNumber
+                    raise ValueError('There no number in the command')
             return func(self, *args, **kwargs)
         return inner
 
